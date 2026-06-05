@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electric Bill Calculator</title>
+<style>
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif;}
+body {background:#FFF8E1; padding:15px; min-height:100vh;}
+.card {
+  background:white; 
+  border-radius:16px; 
+  padding:20px; 
+  max-width:450px; 
+  margin:auto;
+  box-shadow:0 4px 15px rgba(0,0,0,0.1);
+  border-top:5px solid #D32F2F;
+}
+h2 {color:#D32F2F; margin-bottom:15px; text-align:center;}
+label {display:block; margin-top:12px; font-weight:600; font-size:14px; color:#333;}
+input, select {
+  width:100%; 
+  padding:11px; 
+  margin-top:4px; 
+  border:2px solid #FFE0B2; 
+  border-radius:10px;
+  font-size:15px;
+}
+.btn-group {display:flex; gap:8px; margin-top:8px;}
+.btn-group button, .action-btn {
+  flex:1; 
+  padding:10px; 
+  font-size:13px; 
+  margin-top:0;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:600;
+}
+.quick-btn {background:#FFE0B2; color:#D32F2F;}
+.compute-btn {background:linear-gradient(135deg, #D32F2F, #B71C1C); color:white; margin-top:15px;}
+.reset-btn {background:#9e9e9e; color:white;}
+.add-btn {background:#4CAF50; color:white;}
+.appliance-item {
+  border:2px dashed #FFE0B2; 
+  padding:12px; 
+  margin-top:12px; 
+  border-radius:10px;
+  background:#fffdf7;
+  position:relative;
+}
+.remove-btn {
+  position:absolute;
+  top:5px; right:8px;
+  background:#f44336;
+  color:white;
+  border:none;
+  border-radius:50%;
+  width:24px; height:24px;
+  cursor:pointer;
+  font-size:16px;
+  line-height:1;
+}
+.result {
+  margin-top:20px; 
+  padding:15px; 
+  background:#FFF8E1; 
+  border-radius:10px; 
+  border-left:4px solid #D32F2F;
+  display:none;
+}
+.result h3 {color:#D32F2F; margin-bottom:10px;}
+.result-item {padding:8px 0; border-bottom:1px dashed #ddd; font-size:14px;}
+.total {font-size:18px; font-weight:700; color:#D32F2F; margin-top:10px; padding-top:10px; border-top:2px solid #D32F2F;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>⚡ Electric Bill Calculator</h2>
+  
+  <div id="appliancesList"></div>
+  
+  <button class="action-btn add-btn" onclick="addAppliance()">+ Add Another Appliance</button>
+  
+  <label>Rate ni Meralco per kWh</label>
+  <input type="number" id="rate" value="12.5" step="0.01">
+  
+  <div class="btn-group">
+    <button class="action-btn compute-btn" onclick="computeAll()">Compute Total 💰</button>
+    <button class="action-btn reset-btn" onclick="resetAll()">Reset 🗑️</button>
+  </div>
+  
+  <div class="result" id="result">
+    <h3>Bill Summary:</h3>
+    <div id="resultList"></div>
+    <div class="total" id="grandTotal"></div>
+  </div>
+</div>
+
+<script>
+let applianceCount = 0;
+
+function addAppliance() {
+  applianceCount++;
+  const div = document.createElement('div');
+  div.className = 'appliance-item';
+  div.id = 'app' + applianceCount;
+  div.innerHTML = `
+    <button class="remove-btn" onclick="removeAppliance(${applianceCount})">×</button>
+    <label>Appliance Type</label>
+    <select onchange="setWatts(${applianceCount}, this.value)">
+      <option value="custom">Custom/Manual</option>
+      <option value="chest2">Chest Freezer 2-Door 220W</option>
+      <option value="chest3">Chest Freezer 3-Door 320W</option>
+      <option value="ac3hp">Aircon 3HP 2500W</option>
+    </select>
+    
+    <div class="btn-group">
+      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 220)">2-Door 220W</button>
+      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 320)">3-Door 320W</button>
+      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 2500)">3HP 2500W</button>
+    </div>
+    
+    <label>Watts</label>
+    <input type="number" id="watts${applianceCount}" value="350" placeholder="Ex: 350">
+    
+    <label>Ilan piraso?</label>
+    <input type="number" id="qty${applianceCount}" value="1" min="1">
+    
+    <label>Ilan oras/day?</label>
+    <input type="number" id="hours${applianceCount}" value="24" min="1" max="24">
+    
+    <label>Ilan araw?</label>
+    <input type="number" id="days${applianceCount}" value="30" min="1" max="31">
+  `;
+  document.getElementById('appliancesList').appendChild(div);
+}
+
+function removeAppliance(id) {
+  document.getElementById('app' + id).remove();
+}
+
+function setQuickWatts(id, w) {
+  document.getElementById('watts' + id).value = w;
+}
+
+function setWatts(id, type) {
+  if(type === 'chest2') setQuickWatts(id, 220);
+  if(type === 'chest3') setQuickWatts(id, 320);
+  if(type === 'ac3hp') setQuickWatts(id, 2500);
+}
+
+function computeAll() {
+  const rate = parseFloat(document.getElementById('rate').value);
+  const appliances = document.querySelectorAll('.appliance-item');
+  let grandTotal = 0;
+  let resultHTML = '';
+  
+  appliances.forEach((app, idx) => {
+    const id = app.id.replace('app', '');
+    const watts = parseFloat(document.getElementById('watts' + id).value) || 0;
+    const qty = parseInt(document.getElementById('qty' + id).value) || 0;
+    const hours = parseFloat(document.getElementById('hours' + id).value) || 0;
+    const days = parseInt(document.getElementById('days' + id).value) || 0;
+    
+    const kwh = watts * qty * hours * days / 1000;
+    const bill = kwh * rate;
+    grandTotal += bill;
+    
+    resultHTML += `
+      <div class="result-item">
+        <b>Appliance ${idx+1}:</b> ${watts}W x ${qty}pcs<br>
+        ${kwh.toFixed(2)} kWh = ₱${bill.toFixed(2)}
+      </div>
+    `;
+  });
+  
+  document.getElementById('resultList').innerHTML = resultHTML;
+  document.getElementById('grandTotal').innerHTML = `TOTAL MONTHLY BILL: ₱${grandTotal.toLocaleString(undefined, {maximumFractionDigits:2})}`;
+  document.getElementById('result').style.display = 'block';
+}
+
+function resetAll() {
+  document.getElementById('appliancesList').innerHTML = '';
+  document.getElementById('result').style.display = 'none';
+  applianceCount = 0;
+  addAppliance(); // auto add 1 blank
+}
+
+// Auto add 1 appliance pag load
+addAppliance();
+</script>
+</body>
+</html>
