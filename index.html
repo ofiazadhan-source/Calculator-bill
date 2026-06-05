@@ -42,8 +42,10 @@ input:focus, select:focus {outline:none; border-color:#D32F2F;}
 }
 .quick-btn {background:#FFE0B2; color:#B71C1C;}
 .quick-btn:hover {background:#FFCC80;}
-.compute-btn {background:linear-gradient(135deg, #D32F2F, #B71C1C); color:white; margin-top:15px; font-size:14px;}
-.reset-btn {background:#757575; color:white; font-size:14px;}
+.compute-btn {background:linear-gradient(135deg, #D32F2F, #B71C1C); color:white; font-size:13px;}
+.print-btn {background:#1976D2; color:white; font-size:13px;}
+.save-btn {background:#2E7D32; color:white; font-size:13px;}
+.reset-btn {background:#757575; color:white; font-size:13px;}
 .add-btn {background:#2E7D32; color:white;}
 .appliance-item {
   border:2px dashed #FFCC80;
@@ -80,11 +82,18 @@ input:focus, select:focus {outline:none; border-color:#D32F2F;}
 .result-item {padding:10px 0; border-bottom:1px dashed #FFCC80; font-size:14px; line-height:1.5;}
 .total {font-size:20px; font-weight:800; color:#D32F2F; margin-top:12px; padding-top:12px; border-top:3px solid #D32F2F;}
 .note {font-size:12px; color:#666; margin-top:15px; text-align:center; line-height:1.4;}
+
+@media print {
+  body {background:white; padding:0;}
+ .card {box-shadow:none; border:none; max-width:100%;}
+ .btn-group,.add-btn,.remove-btn, input, select {display:none!important;}
+ .result {display:block!important; border:2px solid #D32F2F;}
+}
 </style>
 </head>
 <body>
 
-<div class="card">
+<div class="card" id="printArea">
   <h2>⚡ Siomai + Siopao Factory Calculator</h2>
   <p style="text-align:center; font-size:13px; color:#666; margin-bottom:15px;">Complete Line - Single Phase Converted</p>
 
@@ -96,12 +105,15 @@ input:focus, select:focus {outline:none; border-color:#D32F2F;}
   <input type="number" id="rate" value="12.5" step="0.01">
 
   <div class="btn-group">
-    <button class="action-btn compute-btn" onclick="computeAll()">Compute Total Bill 💰</button>
-    <button class="action-btn reset-btn" onclick="resetAll()">Reset All 🗑️</button>
+    <button class="action-btn compute-btn" onclick="computeAll()">Compute 💰</button>
+    <button class="action-btn print-btn" onclick="printResult()">Print 🖨️</button>
+    <button class="action-btn save-btn" onclick="saveAsImage()">Save JPG 📸</button>
+    <button class="action-btn reset-btn" onclick="resetAll()">Reset 🗑️</button>
   </div>
 
   <div class="result" id="result">
     <h3>Monthly Bill Breakdown:</h3>
+    <p style="font-size:12px; color:#666; margin-bottom:8px;" id="dateTime"></p>
     <div id="resultList"></div>
     <div class="total" id="grandTotal"></div>
   </div>
@@ -170,7 +182,6 @@ function addAppliance() {
       <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 1800)">Dough Mixer 1800W</button>
       <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 1100)">Wrapper Mixer 1100W</button>
       <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 1500)">Filling Mixer 1500W</button>
-      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 2500)">Grinder 2500W</button>
     </div>
 
     <label>Watts / Power Rating</label>
@@ -229,7 +240,6 @@ function computeAll() {
     const days = parseInt(document.getElementById('days' + id).value) || 0;
     const isConverted = document.getElementById('converted' + id).checked;
 
-    // Add 20% loss if converted single phase
     if(isConverted && watts > 0) {
       watts = watts * 1.20;
     }
@@ -248,12 +258,41 @@ function computeAll() {
     `;
   });
 
+  const now = new Date();
+  document.getElementById('dateTime').innerText = 'Generated: ' + now.toLocaleString('en-PH');
   document.getElementById('resultList').innerHTML = resultHTML;
   document.getElementById('grandTotal').innerHTML =
     `TOTAL LOAD: ${totalKW.toFixed(2)} KW<br>
      TOTAL MONTHLY BILL: ₱${grandTotal.toLocaleString(undefined, {maximumFractionDigits:2})}`;
   document.getElementById('result').style.display = 'block';
   document.getElementById('result').scrollIntoView({behavior: 'smooth'});
+}
+
+function printResult() {
+  if(document.getElementById('result').style.display === 'none') {
+    alert('Compute mo muna boss bago mag-print!');
+    return;
+  }
+  window.print();
+}
+
+function saveAsImage() {
+  if(document.getElementById('result').style.display === 'none') {
+    alert('Compute mo muna boss bago mag-save!');
+    return;
+  }
+
+  // Simple text file export kung walang html2canvas
+  const resultText = document.getElementById('printArea').innerText;
+  const blob = new Blob([resultText], {type: 'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Electric_Bill_Compute_' + new Date().toISOString().slice(0,10) + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+
+  alert('Saved as TXT file boss! Pwede mo i-share sa Messenger/WhatsApp.\n\nFor JPG/PNG screenshot, long press mo lang sa phone tapos "Screenshot"');
 }
 
 function resetAll() {
