@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Industrial Electric Bill Calculator PH</title>
+<title>Siomai Siopao Factory Bill Calculator</title>
 <style>
 * {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, sans-serif;}
 body {background:linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 100%); padding:15px; min-height:100vh;}
@@ -85,8 +85,8 @@ input:focus, select:focus {outline:none; border-color:#D32F2F;}
 <body>
 
 <div class="card">
-  <h2>⚡ Industrial Electric Bill Calculator</h2>
-  <p style="text-align:center; font-size:13px; color:#666; margin-bottom:15px;">Para sa Siomai Shop / Food Factory - Single Phase Converted</p>
+  <h2>⚡ Siomai + Siopao Factory Calculator</h2>
+  <p style="text-align:center; font-size:13px; color:#666; margin-bottom:15px;">Complete Line - Single Phase Converted</p>
 
   <div id="appliancesList"></div>
 
@@ -106,7 +106,7 @@ input:focus, select:focus {outline:none; border-color:#D32F2F;}
     <div class="total" id="grandTotal"></div>
   </div>
 
-  <p class="note">*Converted Single Phase = +20% power loss added automatically<br>**Always check actual wattage sticker sa machine</p>
+  <p class="note">*Converted Single Phase = +20% power loss added<br>**Check actual sticker sa machine for exact watts</p>
 </div>
 
 <script>
@@ -121,9 +121,13 @@ const wattsMap = {
   'mixer': 750,
   'grinder': 1200,
   'siomai650': 3000,
+  'siopaoind': 3000,
   'slicer': 750,
   'grinderind': 2500,
   'mixerind': 1300,
+  'doughmixer30': 1800,
+  'wrappermixer': 1100,
+  'fillingmixer': 1500,
   'vacuumind': 900,
   'blastfreezer': 2500
 };
@@ -137,7 +141,7 @@ function addAppliance() {
     <button class="remove-btn" onclick="removeAppliance(${applianceCount})">×</button>
 
     <label>Description / Name ng Machine</label>
-    <input type="text" id="desc${applianceCount}" placeholder="Ex: Siomai Machine 650kg, Meat Slicer" value="Machine ${applianceCount}">
+    <input type="text" id="desc${applianceCount}" placeholder="Ex: Siopao Machine, Siomai Machine" value="Machine ${applianceCount}">
 
     <label>Machine Preset</label>
     <select id="preset${applianceCount}" onchange="setWatts(${applianceCount}, this.value)">
@@ -146,27 +150,31 @@ function addAppliance() {
       <option value="chest3">Chest Freezer 3-Door 320W</option>
       <option value="ac3hp">Aircon 3HP 2500W</option>
       <option value="sealer">Sealer Machine 400W</option>
-      <option value="mixer">Dough Mixer 750W</option>
+      <option value="mixer">Dough Mixer Small 750W</option>
       <option value="grinder">Meat Grinder 1200W</option>
       <option value="siomai650">Siomai Machine 650kg/day 3000W</option>
+      <option value="siopaoind">Siopao Machine Industrial 3000W</option>
       <option value="slicer">Meat Slicer Industrial 750W</option>
       <option value="grinderind">Meat Grinder Industrial 2500W</option>
-      <option value="mixerind">Dough Mixer 30L Industrial 1300W</option>
+      <option value="mixerind">Dough Mixer 30L 1300W</option>
+      <option value="doughmixer30">Dough Mixer 30L-40L 1800W</option>
+      <option value="wrappermixer">Siomai Wrapper Mixer 1100W</option>
+      <option value="fillingmixer">Filling Mixer Industrial 1500W</option>
       <option value="vacuumind">Vacuum Sealer Industrial 900W</option>
       <option value="blastfreezer">Blast Freezer 2500W</option>
     </select>
 
     <div class="btn-group">
-      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 220)">2-Door 220W</button>
-      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 320)">3-Door 320W</button>
-      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 2500)">3HP 2500W</button>
+      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 3000)">Siopao 3000W</button>
       <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 3000)">Siomai 3000W</button>
-      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 750)">Slicer 750W</button>
+      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 1800)">Dough Mixer 1800W</button>
+      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 1100)">Wrapper Mixer 1100W</button>
+      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 1500)">Filling Mixer 1500W</button>
       <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 2500)">Grinder 2500W</button>
     </div>
 
     <label>Watts / Power Rating</label>
-    <input type="number" id="watts${applianceCount}" value="350" placeholder="Ex: 3000">
+    <input type="number" id="watts${applianceCount}" value="3000" placeholder="Ex: 3000">
 
     <label>Ilan piraso?</label>
     <input type="number" id="qty${applianceCount}" value="1" min="1">
@@ -245,8 +253,6 @@ function computeAll() {
     `TOTAL LOAD: ${totalKW.toFixed(2)} KW<br>
      TOTAL MONTHLY BILL: ₱${grandTotal.toLocaleString(undefined, {maximumFractionDigits:2})}`;
   document.getElementById('result').style.display = 'block';
-
-  // Scroll to result
   document.getElementById('result').scrollIntoView({behavior: 'smooth'});
 }
 
