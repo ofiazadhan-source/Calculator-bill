@@ -3,103 +3,130 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Electric Bill Calculator</title>
+<title>Industrial Electric Bill Calculator PH</title>
 <style>
-* {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif;}
-body {background:#FFF8E1; padding:15px; min-height:100vh;}
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, sans-serif;}
+body {background:linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 100%); padding:15px; min-height:100vh;}
 .card {
-  background:white; 
-  border-radius:16px; 
-  padding:20px; 
-  max-width:450px; 
+  background:white;
+  border-radius:18px;
+  padding:22px;
+  max-width:500px;
   margin:auto;
-  box-shadow:0 4px 15px rgba(0,0,0,0.1);
-  border-top:5px solid #D32F2F;
+  box-shadow:0 6px 20px rgba(0,0,0,0.12);
+  border-top:6px solid #D32F2F;
 }
-h2 {color:#D32F2F; margin-bottom:15px; text-align:center;}
+h2 {color:#D32F2F; margin-bottom:18px; text-align:center; font-size:22px;}
 label {display:block; margin-top:12px; font-weight:600; font-size:14px; color:#333;}
 input, select {
-  width:100%; 
-  padding:11px; 
-  margin-top:4px; 
-  border:2px solid #FFE0B2; 
+  width:100%;
+  padding:11px;
+  margin-top:4px;
+  border:2px solid #FFE0B2;
   border-radius:10px;
   font-size:15px;
+  background:#fffdf7;
 }
-.btn-group {display:flex; gap:8px; margin-top:8px;}
-.btn-group button, .action-btn {
-  flex:1; 
-  padding:10px; 
-  font-size:13px; 
+input:focus, select:focus {outline:none; border-color:#D32F2F;}
+.btn-group {display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;}
+.btn-group button,.action-btn {
+  flex:1 1 auto;
+  padding:10px;
+  font-size:12px;
   margin-top:0;
   border:none;
   border-radius:8px;
   cursor:pointer;
   font-weight:600;
+  min-width:85px;
 }
-.quick-btn {background:#FFE0B2; color:#D32F2F;}
-.compute-btn {background:linear-gradient(135deg, #D32F2F, #B71C1C); color:white; margin-top:15px;}
-.reset-btn {background:#9e9e9e; color:white;}
-.add-btn {background:#4CAF50; color:white;}
+.quick-btn {background:#FFE0B2; color:#B71C1C;}
+.quick-btn:hover {background:#FFCC80;}
+.compute-btn {background:linear-gradient(135deg, #D32F2F, #B71C1C); color:white; margin-top:15px; font-size:14px;}
+.reset-btn {background:#757575; color:white; font-size:14px;}
+.add-btn {background:#2E7D32; color:white;}
 .appliance-item {
-  border:2px dashed #FFE0B2; 
-  padding:12px; 
-  margin-top:12px; 
-  border-radius:10px;
+  border:2px dashed #FFCC80;
+  padding:14px;
+  margin-top:14px;
+  border-radius:12px;
   background:#fffdf7;
   position:relative;
 }
 .remove-btn {
   position:absolute;
-  top:5px; right:8px;
-  background:#f44336;
+  top:6px; right:10px;
+  background:#C62828;
   color:white;
   border:none;
   border-radius:50%;
-  width:24px; height:24px;
+  width:26px; height:26px;
   cursor:pointer;
-  font-size:16px;
+  font-size:18px;
   line-height:1;
+  font-weight:bold;
 }
+.checkbox-label {display:flex; align-items:center; gap:8px; margin-top:10px; font-weight:500; font-size:13px; color:#D32F2F;}
+.checkbox-label input {width:auto; margin:0;}
 .result {
-  margin-top:20px; 
-  padding:15px; 
-  background:#FFF8E1; 
-  border-radius:10px; 
-  border-left:4px solid #D32F2F;
+  margin-top:22px;
+  padding:18px;
+  background:#FFF8E1;
+  border-radius:12px;
+  border-left:5px solid #D32F2F;
   display:none;
 }
-.result h3 {color:#D32F2F; margin-bottom:10px;}
-.result-item {padding:8px 0; border-bottom:1px dashed #ddd; font-size:14px;}
-.total {font-size:18px; font-weight:700; color:#D32F2F; margin-top:10px; padding-top:10px; border-top:2px solid #D32F2F;}
+.result h3 {color:#D32F2F; margin-bottom:12px; font-size:18px;}
+.result-item {padding:10px 0; border-bottom:1px dashed #FFCC80; font-size:14px; line-height:1.5;}
+.total {font-size:20px; font-weight:800; color:#D32F2F; margin-top:12px; padding-top:12px; border-top:3px solid #D32F2F;}
+.note {font-size:12px; color:#666; margin-top:15px; text-align:center; line-height:1.4;}
 </style>
 </head>
 <body>
 
 <div class="card">
-  <h2>⚡ Electric Bill Calculator</h2>
-  
+  <h2>⚡ Industrial Electric Bill Calculator</h2>
+  <p style="text-align:center; font-size:13px; color:#666; margin-bottom:15px;">Para sa Siomai Shop / Food Factory - Single Phase Converted</p>
+
   <div id="appliancesList"></div>
-  
-  <button class="action-btn add-btn" onclick="addAppliance()">+ Add Another Appliance</button>
-  
-  <label>Rate ni Meralco per kWh</label>
+
+  <button class="action-btn add-btn" onclick="addAppliance()">+ Add Another Machine</button>
+
+  <label>Meralco Rate per kWh</label>
   <input type="number" id="rate" value="12.5" step="0.01">
-  
+
   <div class="btn-group">
-    <button class="action-btn compute-btn" onclick="computeAll()">Compute Total 💰</button>
-    <button class="action-btn reset-btn" onclick="resetAll()">Reset 🗑️</button>
+    <button class="action-btn compute-btn" onclick="computeAll()">Compute Total Bill 💰</button>
+    <button class="action-btn reset-btn" onclick="resetAll()">Reset All 🗑️</button>
   </div>
-  
+
   <div class="result" id="result">
-    <h3>Bill Summary:</h3>
+    <h3>Monthly Bill Breakdown:</h3>
     <div id="resultList"></div>
     <div class="total" id="grandTotal"></div>
   </div>
+
+  <p class="note">*Converted Single Phase = +20% power loss added automatically<br>**Always check actual wattage sticker sa machine</p>
 </div>
 
 <script>
 let applianceCount = 0;
+
+const wattsMap = {
+  'custom': 0,
+  'chest2': 220,
+  'chest3': 320,
+  'ac3hp': 2500,
+  'sealer': 400,
+  'mixer': 750,
+  'grinder': 1200,
+  'siomai650': 3000,
+  'slicer': 750,
+  'grinderind': 2500,
+  'mixerind': 1300,
+  'vacuumind': 900,
+  'blastfreezer': 2500
+};
 
 function addAppliance() {
   applianceCount++;
@@ -108,35 +135,52 @@ function addAppliance() {
   div.id = 'app' + applianceCount;
   div.innerHTML = `
     <button class="remove-btn" onclick="removeAppliance(${applianceCount})">×</button>
-    
-    <label>Description/Name ng Machine</label>
-    <input type="text" id="desc${applianceCount}" placeholder="Ex: Freezer 3-Door Kanto, AC 3HP Store" value="Appliance ${applianceCount}">
-    
-    <label>Appliance Type</label>
-    <select onchange="setWatts(${applianceCount}, this.value)">
-      <option value="custom">Custom/Manual</option>
+
+    <label>Description / Name ng Machine</label>
+    <input type="text" id="desc${applianceCount}" placeholder="Ex: Siomai Machine 650kg, Meat Slicer" value="Machine ${applianceCount}">
+
+    <label>Machine Preset</label>
+    <select id="preset${applianceCount}" onchange="setWatts(${applianceCount}, this.value)">
+      <option value="custom">Custom/Manual Input</option>
       <option value="chest2">Chest Freezer 2-Door 220W</option>
       <option value="chest3">Chest Freezer 3-Door 320W</option>
       <option value="ac3hp">Aircon 3HP 2500W</option>
+      <option value="sealer">Sealer Machine 400W</option>
+      <option value="mixer">Dough Mixer 750W</option>
+      <option value="grinder">Meat Grinder 1200W</option>
+      <option value="siomai650">Siomai Machine 650kg/day 3000W</option>
+      <option value="slicer">Meat Slicer Industrial 750W</option>
+      <option value="grinderind">Meat Grinder Industrial 2500W</option>
+      <option value="mixerind">Dough Mixer 30L Industrial 1300W</option>
+      <option value="vacuumind">Vacuum Sealer Industrial 900W</option>
+      <option value="blastfreezer">Blast Freezer 2500W</option>
     </select>
-    
+
     <div class="btn-group">
       <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 220)">2-Door 220W</button>
       <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 320)">3-Door 320W</button>
       <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 2500)">3HP 2500W</button>
+      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 3000)">Siomai 3000W</button>
+      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 750)">Slicer 750W</button>
+      <button type="button" class="quick-btn" onclick="setQuickWatts(${applianceCount}, 2500)">Grinder 2500W</button>
     </div>
-    
-    <label>Watts</label>
-    <input type="number" id="watts${applianceCount}" value="350" placeholder="Ex: 350">
-    
+
+    <label>Watts / Power Rating</label>
+    <input type="number" id="watts${applianceCount}" value="350" placeholder="Ex: 3000">
+
     <label>Ilan piraso?</label>
     <input type="number" id="qty${applianceCount}" value="1" min="1">
-    
-    <label>Ilan oras/day?</label>
-    <input type="number" id="hours${applianceCount}" value="24" min="1" max="24">
-    
-    <label>Ilan araw?</label>
+
+    <label>Ilan oras per day?</label>
+    <input type="number" id="hours${applianceCount}" value="8" min="0.5" max="24" step="0.5">
+
+    <label>Ilan araw per month?</label>
     <input type="number" id="days${applianceCount}" value="30" min="1" max="31">
+
+    <label class="checkbox-label">
+      <input type="checkbox" id="converted${applianceCount}" checked>
+      Converted Single Phase +20% power loss
+    </label>
   `;
   document.getElementById('appliancesList').appendChild(div);
 }
@@ -147,51 +191,72 @@ function removeAppliance(id) {
 
 function setQuickWatts(id, w) {
   document.getElementById('watts' + id).value = w;
+  document.getElementById('preset' + id).value = 'custom';
 }
 
 function setWatts(id, type) {
-  if(type === 'chest2') setQuickWatts(id, 220);
-  if(type === 'chest3') setQuickWatts(id, 320);
-  if(type === 'ac3hp') setQuickWatts(id, 2500);
+  if(wattsMap[type] > 0) {
+    document.getElementById('watts' + id).value = wattsMap[type];
+  }
 }
 
 function computeAll() {
   const rate = parseFloat(document.getElementById('rate').value);
   const appliances = document.querySelectorAll('.appliance-item');
   let grandTotal = 0;
+  let totalKW = 0;
   let resultHTML = '';
-  
+
+  if(appliances.length === 0) {
+    alert('Mag-add ka muna ng machine boss!');
+    return;
+  }
+
   appliances.forEach((app, idx) => {
     const id = app.id.replace('app', '');
-    const desc = document.getElementById('desc' + id).value || `Appliance ${idx+1}`;
-    const watts = parseFloat(document.getElementById('watts' + id).value) || 0;
+    const desc = document.getElementById('desc' + id).value || `Machine ${idx+1}`;
+    let watts = parseFloat(document.getElementById('watts' + id).value) || 0;
     const qty = parseInt(document.getElementById('qty' + id).value) || 0;
     const hours = parseFloat(document.getElementById('hours' + id).value) || 0;
     const days = parseInt(document.getElementById('days' + id).value) || 0;
-    
+    const isConverted = document.getElementById('converted' + id).checked;
+
+    // Add 20% loss if converted single phase
+    if(isConverted && watts > 0) {
+      watts = watts * 1.20;
+    }
+
     const kwh = watts * qty * hours * days / 1000;
     const bill = kwh * rate;
     grandTotal += bill;
-    
+    totalKW += watts * qty / 1000;
+
     resultHTML += `
       <div class="result-item">
-        <b>${desc}</b><br>
-        ${watts}W x ${qty}pcs x ${hours}hrs = ${kwh.toFixed(2)} kWh<br>
-        <b>Bill: ₱${bill.toFixed(2)}</b>
+        <b>${desc}</b> ${isConverted? '🔌' : ''}<br>
+        ${watts.toFixed(0)}W x ${qty}pcs x ${hours}hrs x ${days}days<br>
+        = ${kwh.toFixed(2)} kWh → <b>₱${bill.toLocaleString(undefined, {maximumFractionDigits:2})}</b>
       </div>
     `;
   });
-  
+
   document.getElementById('resultList').innerHTML = resultHTML;
-  document.getElementById('grandTotal').innerHTML = `TOTAL MONTHLY BILL: ₱${grandTotal.toLocaleString(undefined, {maximumFractionDigits:2})}`;
+  document.getElementById('grandTotal').innerHTML =
+    `TOTAL LOAD: ${totalKW.toFixed(2)} KW<br>
+     TOTAL MONTHLY BILL: ₱${grandTotal.toLocaleString(undefined, {maximumFractionDigits:2})}`;
   document.getElementById('result').style.display = 'block';
+
+  // Scroll to result
+  document.getElementById('result').scrollIntoView({behavior: 'smooth'});
 }
 
 function resetAll() {
-  document.getElementById('appliancesList').innerHTML = '';
-  document.getElementById('result').style.display = 'none';
-  applianceCount = 0;
-  addAppliance();
+  if(confirm('Clear all machines?')) {
+    document.getElementById('appliancesList').innerHTML = '';
+    document.getElementById('result').style.display = 'none';
+    applianceCount = 0;
+    addAppliance();
+  }
 }
 
 // Auto add 1 appliance pag load
